@@ -3,9 +3,10 @@ package nl.gerimedica.assessment.csv.impl;
 import io.micrometer.common.util.StringUtils;
 import nl.gerimedica.assessment.common.ResourceNotFoundException;
 import nl.gerimedica.assessment.csv.api.DataRecordService;
-import nl.gerimedica.assessment.csv.db.DataRepository;
-import nl.gerimedica.assessment.csv.impl.record.DataRecord;
+import nl.gerimedica.assessment.csv.db.DataRecordRepository;
+import nl.gerimedica.assessment.csv.db.entity.DataRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,14 +16,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Service
 public class DataRecordFacade implements DataRecordService {
 
     @Autowired
-    private DataRepository dataRepository;
+    private DataRecordRepository dataRecordRepository;
 
     @Override
-    public void uploadData(File csvFile) {
+    public void uploadDataRecords(File csvFile) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             List<DataRecord> records = reader.lines().skip(1)
                     .map(line -> {
@@ -31,42 +32,41 @@ public class DataRecordFacade implements DataRecordService {
                         LocalDate fromDate = generateLocalDateFromString(fields[5]);
                         LocalDate toDate = generateLocalDateFromString(fields[6]);
 
-                        return new DataRecord(0,
-                                fields[0],
-                                fields[1],
-                                fields[2],
-                                fields[3],
-                                fields[4],
+                        return new DataRecord(fields[0].replace("\"", ""),
+                                fields[1].replace("\"", ""),
+                                fields[2].replace("\"", ""),
+                                fields[3].replace("\"", ""),
+                                fields[4].replace("\"", ""),
                                 fromDate,
                                 toDate,
-                                fields[7]);
+                                fields[7].replace("\"", ""));
                     })
                     .collect(Collectors.toList());
 
-            dataRepository.saveAll(records);
+            dataRecordRepository.saveAll(records);
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse CSV file", e);
         }
     }
 
     @Override
-    public List<DataRecord> fetchAllData() {
-        return dataRepository.findAll();
+    public List<DataRecord> fetchDataRecords() {
+        return dataRecordRepository.findAll();
     }
 
     @Override
-    public List<DataRecord> fetchByCode(String code) throws ResourceNotFoundException {
-        List<DataRecord> dataRecordsByCode = dataRepository.findByCode(code);
-        if (dataRecordsByCode.isEmpty()) {
-            throw new ResourceNotFoundException("No records found for code " + code + ".");
+    public DataRecord fetchDataRecordByCode(String code) throws ResourceNotFoundException {
+        DataRecord dataRecordByCode = dataRecordRepository.findByCode(code);
+        if (dataRecordByCode == null) {
+            throw new ResourceNotFoundException("No record found for code " + code + ".");
         } else {
-            return dataRecordsByCode;
+            return dataRecordByCode;
         }
     }
 
     @Override
-    public void deleteAllData() {
-        dataRepository.deleteAll();
+    public void deleteAllDataRecords() {
+        dataRecordRepository.deleteAll();
     }
 
     private LocalDate generateLocalDateFromString(String stringFromFile) {

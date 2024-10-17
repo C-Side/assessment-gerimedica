@@ -1,17 +1,17 @@
 package nl.gerimedica.assessment.csv.api;
 
-import nl.gerimedica.assessment.csv.impl.record.DataRecord;
+import nl.gerimedica.assessment.csv.db.entity.DataRecord;
 
 import java.io.File;
 import java.util.List;
 
 public interface DataRecordService {
 
-    void uploadData(File csvFile);
+    void uploadDataRecords(File csvFile);
 
-    List<DataRecord> fetchAllData();
+    List<DataRecord> fetchDataRecords();
 
-    List<DataRecord> fetchByCode(String code);
+    DataRecord fetchDataRecordByCode(String code);
 
-    void deleteAllData();
+    void deleteAllDataRecords();
 }
