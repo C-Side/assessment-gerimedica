@@ -44,6 +44,8 @@ class DataRecordServiceTests {
 		DataRecord result = dataRecordFacade.fetchDataRecordByCode("271636001");
 		assertThat(result).isNotNull();
 		assertThat(result.getCode()).isEqualTo("271636001");
+		assertThat(result.getLongDescription()).isEqualTo("The long description is necessary");
+		assertThat(result.getToDate()).isNull();
 	}
 
 	@Test

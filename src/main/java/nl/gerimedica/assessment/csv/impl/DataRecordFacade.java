@@ -1,6 +1,7 @@
 package nl.gerimedica.assessment.csv.impl;
 
 import io.micrometer.common.util.StringUtils;
+import nl.gerimedica.assessment.common.FileParsingException;
 import nl.gerimedica.assessment.common.ResourceNotFoundException;
 import nl.gerimedica.assessment.csv.api.DataRecordService;
 import nl.gerimedica.assessment.csv.db.DataRecordRepository;
@@ -23,7 +24,7 @@ public class DataRecordFacade implements DataRecordService {
     private DataRecordRepository dataRecordRepository;
 
     @Override
-    public void uploadDataRecords(File csvFile) {
+    public void uploadDataRecords(File csvFile) throws RuntimeException {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             List<DataRecord> records = reader.lines().skip(1)
                     .map(line -> {
@@ -32,20 +33,21 @@ public class DataRecordFacade implements DataRecordService {
                         LocalDate fromDate = generateLocalDateFromString(fields[5]);
                         LocalDate toDate = generateLocalDateFromString(fields[6]);
 
-                        return new DataRecord(fields[0].replace("\"", ""),
-                                fields[1].replace("\"", ""),
-                                fields[2].replace("\"", ""),
-                                fields[3].replace("\"", ""),
-                                fields[4].replace("\"", ""),
+                        return new DataRecord(cleanField(fields[0]),
+                                cleanField(fields[1]),
+                                cleanField(fields[2]),
+                                cleanField(fields[3]),
+                                cleanField(fields[4]),
                                 fromDate,
                                 toDate,
-                                fields[7].replace("\"", ""));
+                                cleanField(fields[7])
+                        );
                     })
                     .collect(Collectors.toList());
 
             dataRecordRepository.saveAll(records);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse CSV file", e);
+            throw new FileParsingException("Failed to parse CSV file", e);
         }
     }
 
@@ -67,6 +69,10 @@ public class DataRecordFacade implements DataRecordService {
     @Override
     public void deleteAllDataRecords() {
         dataRecordRepository.deleteAll();
+    }
+
+    private String cleanField(String dataRecordField) {
+        return dataRecordField.replace("\"", "");
     }
 
     private LocalDate generateLocalDateFromString(String stringFromFile) {

@@ -29,7 +29,7 @@ public class DataRecordController {
     }
 
     @GetMapping("/code/{code}")
-    public ResponseEntity<DataRecord> getDataRecordByCode(@PathVariable String code) {
+    public ResponseEntity<Object> getDataRecordByCode(@PathVariable String code) {
         DataRecord record = dataRecordService.fetchDataRecordByCode(code);
         return ResponseEntity.ok(record);
     }
