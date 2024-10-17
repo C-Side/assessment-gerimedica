@@ -18,12 +18,12 @@ public class DataRecord {
     private String longDescription;
     private LocalDate fromDate;
     private LocalDate toDate;
-    private String sourceSystem;
+    private String sortingPriority;
 
     public DataRecord() {
     }
 
-    public DataRecord(String source, String codeListCode, String code, String displayValue, String longDescription, LocalDate fromDate, LocalDate toDate, String sourceSystem) {
+    public DataRecord(String source, String codeListCode, String code, String displayValue, String longDescription, LocalDate fromDate, LocalDate toDate, String sortingPriority) {
         this.source = source;
         this.codeListCode = codeListCode;
         this.code = code;
@@ -31,7 +31,7 @@ public class DataRecord {
         this.longDescription = longDescription;
         this.fromDate = fromDate;
         this.toDate = toDate;
-        this.sourceSystem = sourceSystem;
+        this.sortingPriority = sortingPriority;
     }
 
     public String getSource() {
@@ -90,11 +90,11 @@ public class DataRecord {
         this.toDate = toDate;
     }
 
-    public String getSourceSystem() {
-        return sourceSystem;
+    public String getSortingPriority() {
+        return sortingPriority;
     }
 
-    public void setSourceSystem(String sourceSystem) {
-        this.sourceSystem = sourceSystem;
+    public void setSortingPriority(String sourceSystem) {
+        this.sortingPriority = sourceSystem;
     }
 }
